@@ -123,8 +123,12 @@ h1, h2, h3 { font-family: var(--serif); color: var(--ink); text-wrap: balance; m
 .wire .pk.up { top: -20px; color: var(--orange-d); }
 .wire .pk.dn { bottom: -22px; color: #0d7464; }
 @media (max-width: 700px) { .wire { display: none; } .bubble { font-size: 13px; white-space: normal; width: 190px; text-align: center; } .cast { row-gap: 110px; } }
-.authors { margin-top: 40px; font: 16px var(--sans); color: var(--sub); }
-.authors b { color: var(--ink); font-weight: 600; }
+.authors { margin-top: 40px; font: 17px/1.7 var(--sans); color: var(--ink); }
+.authors .names { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 22px; font-weight: 600; }
+.authors sup { font-size: 11px; font-weight: 600; color: var(--orange-d); margin-left: 1px; }
+.authors .affs { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 18px; margin-top: 6px; font-size: 14.5px; color: var(--sub); }
+.authors .affs sup { color: var(--sub); }
+.authors .marks { margin-top: 4px; font-size: 13px; color: var(--faint); }
 .btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 18px; }
 .btn {
   display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
@@ -373,7 +377,11 @@ footer .cast-mini img { width: 30px; }
     </div>
   </div>
 
-  <div class="authors"><b>Anonymous authors</b> · paper under review</div>
+  <div class="authors">
+    <div class="names"><span>Zixian Gao<sup>1,2,§</sup></span><span>Lixin Xiu<sup>2</sup></span><span>Penghao Luo<sup>3</sup></span><span>Ziqi Cai<sup>4</sup></span><span>Kaipeng Zhang<sup>1,†</sup></span></div>
+    <div class="affs"><span><sup>1</sup>Alaya Lab</span><span><sup>2</sup>The University of Tokyo</span><span><sup>3</sup>Georgia Institute of Technology</span><span><sup>4</sup>Peking University</span></div>
+    <div class="marks">† Corresponding author</div>
+  </div>
   <div class="btns">
     <a class="btn soon" aria-disabled="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>Paper (soon)</a>
     <a class="btn soon" aria-disabled="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>arXiv (soon)</a>
@@ -536,7 +544,7 @@ footer .cast-mini img { width: 30px; }
     <button type="button" id="copybib">Copy</button>
 <pre id="bibtext">@article{streamduo2026,
   title  = {StreamDuo: A Live Commentator and a Research Agent for Unseen Games},
-  author = {Anonymous},
+  author = {Gao, Zixian and Xiu, Lixin and Luo, Penghao and Cai, Ziqi and Zhang, Kaipeng},
   year   = {2026}
 }</pre>
   </div>

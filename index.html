@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StreamDuo</title>
+<meta name="description" content="StreamDuo: a live commentator and a research agent for unseen games.">
+<meta property="og:title" content="StreamDuo">
+<meta property="og:description" content="A live commentator and a research agent for unseen games.">
+<meta property="og:image" content="static/img/teaser.png">
+<link rel="icon" href="static/icons/robot.png">
+<style>
+@font-face { font-family: "P052"; src: url(static/fonts/P052-Roman.otf) format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "P052"; src: url(static/fonts/P052-Italic.otf) format("opentype"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "P052"; src: url(static/fonts/P052-Bold.otf) format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "P052"; src: url(static/fonts/P052-BoldItalic.otf) format("opentype"); font-weight: 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "Inter"; src: url(static/fonts/Inter-Regular.ttf) format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Inter"; src: url(static/fonts/Inter-SemiBold.ttf) format("truetype"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Inter"; src: url(static/fonts/Inter-Bold.ttf) format("truetype"); font-weight: 700; font-display: swap; }
+
+/* One visual world shared with the paper figures: paper white, navy ink outlines, broadcast orange. */
+:root {
+  color-scheme: light;
+  --paper: #fbf8f1;
+  --paper-2: #f3eee2;
+  --card: #ffffff;
+  --ink: #1e2229;
+  --sub: #4a5059;
+  --faint: #8a9099;
+  --navy: #2f4677;
+  --navy-l: #e7ecf6;
+  --orange: #ec8a22;
+  --orange-d: #bf650b;
+  --orange-l: #fdf0dd;
+  --teal: #17a08a;
+  --teal-l: #e2f4f0;
+  --red: #d2543f;
+  --red-l: #fbe7e3;
+  --blue: #3260b8;
+  --line: 2.5px solid var(--navy);
+  --pop: 5px 5px 0 var(--navy);
+  --serif: "P052", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 17px/1.65 var(--sans);
+  background-image: radial-gradient(rgba(47,70,119,.07) 1.2px, transparent 1.3px);
+  background-size: 22px 22px;
+}
+img { max-width: 100%; display: block; }
+a { color: var(--blue); }
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.serif { font-family: var(--serif); }
+h1, h2, h3 { font-family: var(--serif); color: var(--ink); text-wrap: balance; margin: 0; }
+
+/* ---------- top bar ---------- */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: rgba(251,248,241,.9); backdrop-filter: blur(6px);
+  border-bottom: 2px solid rgba(47,70,119,.18);
+}
+.topbar .wrap { display: flex; align-items: center; gap: 18px; height: 52px; }
+.brand { display: flex; align-items: center; gap: 8px; font: 700 18px var(--serif); color: var(--navy); text-decoration: none; }
+.brand img { width: 26px; }
+.nav { display: flex; gap: 4px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
+.nav a {
+  font: 600 13px var(--sans); color: var(--sub); text-decoration: none;
+  padding: 5px 10px; border-radius: 999px; white-space: nowrap;
+}
+.nav a:hover { background: var(--navy-l); color: var(--navy); }
+@media (max-width: 700px) { .nav { display: none; } }
+
+/* ---------- hero ---------- */
+.hero { padding-block: 56px 36px; text-align: center; position: relative; }
+.onair {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 700 12px var(--sans); letter-spacing: .14em; text-transform: uppercase;
+  color: var(--red); border: 2px solid var(--red); border-radius: 999px; padding: 3px 12px 3px 10px; background: var(--card);
+}
+.onair i { width: 9px; height: 9px; border-radius: 50%; background: var(--red); animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+.hero h1 {
+  font-size: clamp(54px, 10vw, 104px); line-height: 1; margin-top: 18px; letter-spacing: -.01em;
+}
+.hero h1 .duo { color: var(--orange); }
+.hero .tag {
+  font: italic 400 clamp(19px, 2.6vw, 26px)/1.35 var(--serif); color: var(--sub); margin: 12px auto 0; max-width: 760px;
+}
+.cast { display: flex; justify-content: center; align-items: flex-end; gap: clamp(18px, 6vw, 80px); margin-top: 92px; flex-wrap: wrap; }
+.char { position: relative; width: 210px; }
+.char .av {
+  width: 108px; height: 108px; margin: 0 auto; border: var(--line); border-radius: 50%;
+  background: var(--card); box-shadow: var(--pop); display: grid; place-items: center;
+}
+.char .av img { width: 74px; }
+.char.c1 .av { animation: bob 3.2s ease-in-out infinite; }
+.char.c2 .av { animation: bob 3.2s ease-in-out .8s infinite; }
+@keyframes bob { 50% { transform: translateY(-7px); } }
+.char .nm { font: 700 17px var(--serif); margin-top: 12px; }
+.char .rl { font: 13px var(--sans); color: var(--faint); }
+.bubble {
+  position: absolute; bottom: 172px; left: 50%; transform: translateX(-50%);
+  background: var(--card); border: var(--line); border-radius: 16px; padding: 6px 12px;
+  font: italic 15px/1.3 var(--serif); white-space: nowrap; box-shadow: 3px 3px 0 var(--navy);
+}
+.bubble::after {
+  content: ""; position: absolute; left: 50%; bottom: -9px; width: 14px; height: 14px; background: var(--card);
+  border-right: var(--line); border-bottom: var(--line); transform: translateX(-50%) rotate(45deg);
+}
+.c2 .bubble { background: var(--orange-l); }
+.c2 .bubble::after { background: var(--orange-l); }
+.wire { flex: 0 0 120px; align-self: center; position: relative; height: 34px; margin-bottom: 70px; }
+.wire svg { width: 100%; height: 100%; overflow: visible; }
+.wire .pk { font: 700 12px var(--sans); position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; }
+.wire .pk.up { top: -20px; color: var(--orange-d); }
+.wire .pk.dn { bottom: -22px; color: #0d7464; }
+@media (max-width: 700px) { .wire { display: none; } .bubble { font-size: 13px; white-space: normal; width: 190px; text-align: center; } .cast { row-gap: 110px; } }
+.authors { margin-top: 40px; font: 16px var(--sans); color: var(--sub); }
+.authors b { color: var(--ink); font-weight: 600; }
+.btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 18px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+  font: 600 15px var(--sans); color: var(--card); background: var(--navy);
+  border: var(--line); border-radius: 999px; padding: 8px 18px; box-shadow: 3px 3px 0 var(--orange);
+  transition: transform .12s, box-shadow .12s;
+}
+.btn:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--orange); }
+.btn.soon { background: var(--card); color: var(--faint); box-shadow: none; cursor: default; border-style: dashed; }
+.btn.soon:hover { transform: none; }
+.btn svg { width: 17px; height: 17px; }
+
+/* ---------- section scaffolding ---------- */
+section { padding-block: 44px; scroll-margin-top: 64px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 10px; background: var(--card);
+  border: var(--line); border-radius: 999px; padding: 6px 18px 6px 8px; box-shadow: 3px 3px 0 var(--navy);
+}
+.pill img { width: 30px; }
+.pill h2 { font-size: 22px; }
+.lead { font: 400 18px/1.7 var(--sans); color: var(--sub); max-width: 760px; margin: 18px 0 0; }
+.lead b { color: var(--ink); }
+.card {
+  background: var(--card); border: var(--line); border-radius: 22px; box-shadow: var(--pop);
+}
+
+/* ---------- video ---------- */
+.tv { margin-top: 26px; padding: 14px; position: relative; }
+.tv video { width: 100%; border-radius: 12px; display: block; background: #0b0f17; aspect-ratio: 16/9; }
+.tv .ant { position: absolute; top: -38px; left: 50%; width: 90px; height: 40px; transform: translateX(-50%); }
+
+/* ---------- tl;dr ---------- */
+.tldr { margin-top: 26px; padding: 22px 26px; display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; background: var(--orange-l); }
+.tldr img { width: 56px; }
+.tldr p { margin: 0; font: 400 20px/1.55 var(--serif); }
+.tldr p b { color: var(--orange-d); }
+@media (max-width: 600px) { .tldr { grid-template-columns: 1fr; } .tldr p { font-size: 18px; } }
+
+/* ---------- live replay ---------- */
+.replay { margin-top: 26px; padding: 18px; display: grid; gap: 16px; }
+.stage { position: relative; border-radius: 14px; overflow: hidden; border: 2px solid var(--navy); background: #0b0f17; }
+.stage img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+.stage .badge {
+  position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; align-items: center;
+  font: 700 12px var(--sans); color: #fff; background: rgba(210,84,63,.95); padding: 3px 10px; border-radius: 6px; letter-spacing: .1em;
+}
+.stage .badge i { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: blink 1.2s infinite; }
+.stage .clock {
+  position: absolute; top: 12px; right: 12px; font: 600 13px var(--mono); color: #fff;
+  background: rgba(11,15,23,.7); padding: 3px 9px; border-radius: 6px;
+}
+.stage .game { position: absolute; left: 12px; bottom: 12px; font: 600 12px var(--sans); color: #fff; background: rgba(11,15,23,.65); padding: 3px 9px; border-radius: 6px; }
+.agentcard {
+  position: absolute; right: 14px; bottom: 14px; max-width: min(360px, 70%);
+  display: flex; gap: 10px; align-items: center; background: var(--card); border: var(--line);
+  border-radius: 14px; padding: 8px 12px; box-shadow: 4px 4px 0 var(--orange);
+  transform: translateY(20px) scale(.92); opacity: 0; transition: all .35s cubic-bezier(.3,1.6,.5,1);
+}
+.agentcard.on { transform: none; opacity: 1; }
+.agentcard img.face { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 2px solid var(--navy); aspect-ratio: auto; }
+.agentcard .t { font: 700 15px/1.2 var(--serif); }
+.agentcard .t em { font-weight: 400; color: var(--faint); font-size: 13px; }
+.agentcard .d { font: italic 13px/1.3 var(--serif); color: var(--sub); }
+.agentcard .det { width: 30px; aspect-ratio: auto; }
+.lanes { display: grid; gap: 12px; }
+.lane { display: grid; grid-template-columns: 54px 1fr auto; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 16px; border: 2px solid var(--navy); background: var(--paper); min-width: 0; }
+.lane .who img { width: 42px; aspect-ratio: auto; }
+.lane .who { text-align: center; font: 600 10px/1.2 var(--sans); color: var(--faint); }
+.lane .txt { font: italic 19px/1.4 var(--serif); color: var(--sub); min-height: 2.8em; min-width: 0; overflow-wrap: anywhere; }
+.lane .txt .w { transition: color .3s; }
+.lane .txt .w.now { color: var(--ink); background: linear-gradient(transparent 62%, rgba(236,138,34,.28) 62%); }
+.lane .txt .ent { color: var(--orange-d); font-weight: 700; }
+.lane .txt .askchip {
+  font: 700 11px var(--sans); font-style: normal; color: #fff; background: var(--orange); border-radius: 999px; padding: 1px 8px; vertical-align: 3px; margin: 0 4px;
+}
+.lane .verdict { font: 600 13px var(--sans); white-space: nowrap; opacity: 0; transition: opacity .4s; display: flex; align-items: center; gap: 6px; }
+.lane .verdict.on { opacity: 1; }
+.lane .verdict img { width: 24px; aspect-ratio: auto; }
+.lane.l1 .verdict { color: var(--red); }
+.lane.l2 { background: var(--orange-l); }
+.lane.l2 .verdict { color: var(--teal); }
+@media (max-width: 640px) {
+  .lane { grid-template-columns: 56px 1fr; gap: 8px; padding: 10px; } .lane .verdict { grid-column: 1 / -1; justify-self: end; } .lane .txt { font-size: 16px; }
+  .lane .who { font-size: 8.5px; letter-spacing: -.01em; } .lane .who img { width: 34px; margin: 0 auto; }
+  .stage { display: flex; flex-direction: column; } .agentcard { position: static; max-width: none; margin: 8px; box-shadow: 3px 3px 0 var(--orange); }
+  .agentcard:not(.on) { display: none; } .track .lbl { font-size: 9px; }
+  .stage .game { bottom: auto; top: 46px; }
+}
+.ctrl { display: flex; align-items: center; gap: 12px; }
+.ctrl button {
+  font: 600 14px var(--sans); color: var(--navy); background: var(--card); border: 2px solid var(--navy);
+  border-radius: 999px; padding: 5px 14px; cursor: pointer; box-shadow: 2px 2px 0 var(--navy);
+}
+.ctrl button:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--navy); }
+.track { position: relative; flex: 1; height: 34px; min-width: 0; margin-right: 8px; }
+.track .rail { position: absolute; left: 0; right: 0; top: 15px; height: 4px; background: var(--navy-l); border-radius: 4px; }
+.track .fill { position: absolute; left: 0; top: 15px; height: 4px; background: var(--navy); border-radius: 4px; transition: width .4s; }
+.track .tick { position: absolute; top: 10px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--card); border: 2px solid var(--navy); cursor: pointer; }
+.track .tick.ask { background: var(--orange); border-color: var(--orange-d); }
+.track .tick.ans { background: var(--teal); border-color: #0d7464; }
+.track .lbl { position: absolute; top: -8px; font: 700 10px var(--sans); transform: translateX(-50%); white-space: nowrap; }
+.track .lbl.ask { color: var(--orange-d); }
+.track .lbl.ans { color: #0d7464; }
+.cap { font: 13px var(--sans); color: var(--faint); margin: 0; }
+
+/* ---------- problem ---------- */
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 22px; margin-top: 26px; }
+@media (max-width: 860px) { .trio { grid-template-columns: 1fr; } }
+.trio .card { padding: 20px 20px 18px; }
+.trio .card .hd { display: flex; align-items: center; gap: 10px; }
+.trio .card .hd img { width: 40px; }
+.trio .card h3 { font-size: 20px; }
+.trio .card p { margin: 10px 0 0; color: var(--sub); font-size: 15.5px; }
+.trio .q { margin-top: 12px; padding: 10px 12px; border-radius: 12px; font: italic 16px/1.4 var(--serif); }
+.q.bad { background: var(--red-l); }
+.q.meh { background: var(--paper-2); }
+.q.good { background: var(--teal-l); }
+.q .x { color: var(--red); font-weight: 700; font-style: normal; }
+.q .ok { color: var(--teal); font-weight: 700; }
+.leakbox { margin-top: 26px; padding: 22px 24px; display: grid; grid-template-columns: minmax(0, 260px) 1fr; gap: 24px; align-items: center; }
+@media (max-width: 760px) { .leakbox { grid-template-columns: 1fr; } }
+.leakbox h3 { font-size: 21px; }
+.leakbox p { margin: 8px 0 0; color: var(--sub); font-size: 15px; }
+.bars { display: grid; gap: 10px; }
+.bar { display: grid; grid-template-columns: 150px 1fr 56px; gap: 10px; align-items: center; font: 600 14px var(--sans); }
+@media (max-width: 520px) { .bar { grid-template-columns: 96px 1fr 48px; font-size: 12.5px; } }
+.bar .b { height: 22px; border-radius: 6px; border: 2px solid var(--navy); background: var(--red); width: 0; transition: width 1s cubic-bezier(.2,.8,.2,1); }
+.bar.us .b { background: var(--teal); }
+.bar .v { font: 700 14px var(--mono); }
+
+/* ---------- method ---------- */
+.fig { margin-top: 26px; padding: 14px; }
+.fig img { border-radius: 10px; }
+.figcap { font: 14px/1.55 var(--sans); color: var(--sub); margin: 12px 6px 2px; }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 22px; margin-top: 30px; counter-reset: s; }
+@media (max-width: 860px) { .steps { grid-template-columns: 1fr; } }
+.step { padding: 20px; position: relative; }
+.step .num {
+  position: absolute; top: -16px; left: 18px; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--orange); color: #fff; border: var(--line); display: grid; place-items: center; font: 700 15px var(--sans);
+}
+.step .ic { display: flex; gap: 6px; margin-top: 6px; }
+.step .ic img { width: 34px; }
+.step h3 { font-size: 20px; margin-top: 8px; }
+.step p { margin: 8px 0 0; color: var(--sub); font-size: 15.5px; }
+.train { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 22px; margin-top: 30px; }
+@media (max-width: 860px) { .train { grid-template-columns: 1fr; } }
+.train .card { padding: 22px; }
+.train .stg { font: 700 12px var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--orange-d); }
+.train h3 { font-size: 22px; margin-top: 4px; }
+.train h3 i { color: var(--orange-d); }
+.train p { margin: 10px 0 0; color: var(--sub); font-size: 15.5px; }
+.eq { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--navy-l); font: italic 17px/1.5 var(--serif); text-align: center; overflow-x: auto; }
+.eq b { font-style: normal; color: var(--orange-d); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.chip { font: 600 12.5px var(--sans); border: 2px solid var(--navy); border-radius: 999px; padding: 3px 10px; background: var(--card); display: inline-flex; gap: 6px; align-items: center; }
+.chip img { width: 18px; }
+
+/* ---------- games ---------- */
+.gwrap { display: grid; grid-template-columns: minmax(0, 250px) 64px minmax(0, 1fr); gap: 16px; align-items: center; margin-top: 30px; }
+.gwrap .arrow { text-align: center; font: 700 12px/1.3 var(--sans); color: var(--orange-d); }
+.gwrap .arrow svg { width: 56px; height: 30px; display: block; margin: 0 auto 4px; }
+.games { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .gwrap { grid-template-columns: 1fr; } .gwrap .src { max-width: 300px; margin: 0 auto; } .gwrap .arrow svg { transform: rotate(90deg); } .games { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
+.gm { background: var(--card); border: var(--line); border-radius: 14px; padding: 8px 8px 10px; box-shadow: 4px 4px 0 var(--navy); transition: transform .2s; }
+.gm:nth-child(odd) { transform: rotate(-1.2deg); }
+.gm:nth-child(even) { transform: rotate(1deg); }
+.gm:hover { transform: rotate(0) scale(1.04); }
+.gm img { border-radius: 8px; aspect-ratio: 16/10; object-fit: cover; width: 100%; }
+.gm .n { font: 700 14px/1.25 var(--serif); margin-top: 7px; text-align: center; }
+.gm.src .n { font-size: 18px; }
+.gm .k { font: 600 11px var(--sans); color: var(--faint); text-align: center; text-transform: uppercase; letter-spacing: .08em; }
+.gm.src { background: var(--orange-l); border-color: var(--orange-d); box-shadow: 4px 4px 0 var(--orange-d); }
+.gm.src .k { color: var(--orange-d); }
+
+/* ---------- results ---------- */
+.res { margin-top: 26px; padding: 22px 24px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tabs button {
+  font: 600 14px var(--sans); color: var(--navy); background: var(--card); border: 2px solid var(--navy);
+  border-radius: 999px; padding: 5px 14px; cursor: pointer;
+}
+.tabs button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+.mdesc { font: 14.5px var(--sans); color: var(--sub); margin: 14px 0 16px; min-height: 2.6em; }
+.rbars { display: grid; gap: 9px; }
+.rb { display: grid; grid-template-columns: 210px 1fr 64px; gap: 10px; align-items: center; font: 600 14px var(--sans); }
+@media (max-width: 560px) { .rb { grid-template-columns: 112px 1fr 52px; font-size: 12px; } }
+.rb .nm small { display: block; font: 500 11px var(--sans); color: var(--faint); }
+.rb .b { height: 24px; border-radius: 6px; border: 2px solid var(--navy); background: var(--navy-l); transition: width .8s cubic-bezier(.2,.8,.2,1); width: 0; }
+.rb.us .b { background: var(--orange); }
+.rb.us .nm { color: var(--orange-d); }
+.rb .v { font: 700 14px var(--mono); text-align: right; }
+.note { font: 12.5px var(--sans); color: var(--faint); margin-top: 16px; }
+
+/* ---------- bibtex ---------- */
+.bib { margin-top: 24px; padding: 18px 20px; position: relative; }
+.bib pre { margin: 0; font: 13.5px/1.6 var(--mono); color: var(--ink); overflow-x: auto; white-space: pre; }
+.bib button { position: absolute; top: 12px; right: 12px; font: 600 13px var(--sans); border: 2px solid var(--navy); background: var(--card); border-radius: 999px; padding: 4px 12px; cursor: pointer; color: var(--navy); }
+
+footer { padding-block: 34px 48px; text-align: center; font: 13px var(--sans); color: var(--faint); }
+footer .cast-mini { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+footer .cast-mini img { width: 30px; }
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s, transform .6s; }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="static/icons/robot.png" alt="">StreamDuo</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#video">Video</a><a href="#replay">Live replay</a><a href="#problem">Problem</a>
+      <a href="#method">Method</a><a href="#games">Games</a><a href="#results">Results</a><a href="#bibtex">BibTeX</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+<!-- ================= HERO ================= -->
+<div class="hero wrap">
+  <span class="onair"><i></i>Live · cross-game commentary</span>
+  <h1>Stream<span class="duo">Duo</span></h1>
+  <p class="tag">A Live Commentator and a Research Agent for Unseen Games</p>
+
+  <div class="cast" aria-hidden="true">
+    <div class="char c1">
+      <div class="bubble" id="b1">“Hmm, who is she?”</div>
+      <div class="av"><img src="static/icons/robot.png" alt=""></div>
+      <div class="nm">Commentator</div>
+      <div class="rl">watches every second · trainable</div>
+    </div>
+    <div class="wire">
+      <div class="pk up">frames →</div><div class="pk dn">← answer, +2 s</div>
+      <svg viewBox="0 0 120 34"><path d="M4 12 Q60 -6 116 12" fill="none" stroke="#ec8a22" stroke-width="3" stroke-dasharray="6 6"><animate attributeName="stroke-dashoffset" from="24" to="0" dur="1s" repeatCount="indefinite"/></path><path d="M116 24 Q60 42 4 24" fill="none" stroke="#17a08a" stroke-width="3" stroke-dasharray="6 6"><animate attributeName="stroke-dashoffset" from="0" to="24" dur="1s" repeatCount="indefinite"/></path></svg>
+    </div>
+    <div class="char c2">
+      <div class="bubble" id="b2">“That’s Cara, she owns a jewelry shop.”</div>
+      <div class="av"><img src="static/icons/detective.png" alt=""></div>
+      <div class="nm">Research agent</div>
+      <div class="rl">reads the game wiki · frozen</div>
+    </div>
+  </div>
+
+  <div class="authors"><b>Anonymous authors</b> · paper under review</div>
+  <div class="btns">
+    <a class="btn soon" aria-disabled="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>Paper (soon)</a>
+    <a class="btn soon" aria-disabled="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>arXiv (soon)</a>
+    <a class="btn soon" aria-disabled="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .8.1-.7.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5a3.9 3.9 0 0 1 1-2.7 3.6 3.6 0 0 1 .1-2.7s.8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7a3.9 3.9 0 0 1 1 2.7c0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>Code (soon)</a>
+    <a class="btn" href="#video"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Video</a>
+  </div>
+</div>
+
+<!-- ================= VIDEO ================= -->
+<section id="video" class="wrap reveal">
+  <div class="pill"><img src="static/icons/tv.png" alt=""><h2>Watch</h2></div>
+  <div class="card tv">
+    <video controls muted playsinline preload="metadata" poster="static/video/streamduo_poster.jpg">
+      <source src="static/video/streamduo_promo.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="card tldr">
+    <img src="static/icons/bulb.png" alt="">
+    <p><b>TL;DR</b>&nbsp; Trained on one game, StreamDuo commentates games it has never seen. When the commentator spots something it cannot name, it <b>asks a research agent with the frames</b> and keeps talking. The answer comes back <b>two seconds later</b>, while the stream goes on.</p>
+  </div>
+</section>
+
+<!-- ================= LIVE REPLAY ================= -->
+<section id="replay" class="wrap reveal">
+  <div class="pill"><img src="static/icons/red.png" alt=""><h2>Live replay</h2></div>
+  <p class="lead">Ten real seconds of <b>The Legend of Zelda: Tears of the Kingdom</b>, a game neither model saw in training. Both commentators were trained only on Baldur’s Gate 3. Press play and watch them side by side.</p>
+  <div class="card replay">
+    <div class="stage">
+      <img id="frame" src="static/img/cara_2103.jpg" alt="Tears of the Kingdom gameplay frame">
+      <div class="badge"><i></i>LIVE</div>
+      <div class="clock" id="clock">35:03</div>
+      <div class="game">Tears of the Kingdom · unseen</div>
+      <div class="agentcard" id="agentcard">
+        <img class="det" src="static/icons/detective.png" alt="">
+        <img class="face" src="static/img/cara_face.jpg" alt="Cara">
+        <div><div class="t">Cara <em>character</em></div><div class="d">owns the Starlight Memories jewelry shop</div></div>
+      </div>
+    </div>
+    <div class="lanes">
+      <div class="lane l1">
+        <div class="who"><img src="static/icons/robot.png" alt="">single<br>commentator</div>
+        <div class="txt" id="t1"></div>
+        <div class="verdict" id="v1"><img src="static/icons/cross.png" alt="">never says who she is</div>
+      </div>
+      <div class="lane l2">
+        <div class="who"><img src="static/icons/robot.png" alt="">StreamDuo</div>
+        <div class="txt" id="t2"></div>
+        <div class="verdict" id="v2"><img src="static/icons/check.png" alt="">names her</div>
+      </div>
+    </div>
+    <div class="ctrl">
+      <button id="play" type="button">▶ Play</button>
+      <div class="track" id="track"><div class="rail"></div><div class="fill" id="fill"></div></div>
+    </div>
+    <p class="cap">Single commentator = Proact-VL retrained on the same Baldur’s Gate 3 data. One line per second, as both models spoke it. Click a dot to jump to that second.</p>
+  </div>
+</section>
+
+<!-- ================= PROBLEM ================= -->
+<section id="problem" class="wrap reveal">
+  <div class="pill"><img src="static/icons/game.png" alt=""><h2>Timing transfers. Knowledge does not.</h2></div>
+  <p class="lead">A streaming commentator trained on one game learns <b>when</b> to talk, and that carries over to any game. What it learns to <b>say</b> about characters, items and places belongs to the training game. Facing a new game, it does one of three things.</p>
+  <div class="trio">
+    <div class="card">
+      <div class="hd"><img src="static/icons/speak.png" alt=""><h3>Talks around it</h3></div>
+      <p>Describes what it sees and never names it.</p>
+      <div class="q meh">“His ears look to be about the circumference of his head and neck, interesting.”</div>
+    </div>
+    <div class="card">
+      <div class="hd"><img src="static/icons/brain.png" alt=""><h3>Reaches for its training game</h3></div>
+      <p>Fills the gap with a name it memorized from Baldur’s Gate 3.</p>
+      <div class="q bad">A character in Tears of the Kingdom called <span class="x">“Shadowheart”</span>.</div>
+    </div>
+    <div class="card">
+      <div class="hd"><img src="static/icons/detective.png" alt=""><h3>Asks, and names it</h3></div>
+      <p>StreamDuo sends the frames to a research agent and uses what comes back.</p>
+      <div class="q good">“<span class="ok">Cara</span> is a <span class="ok">jewelry owner</span> in the town.”</div>
+    </div>
+  </div>
+  <div class="card leakbox">
+    <div>
+      <h3>Source-game leakage</h3>
+      <p>Share of the names a model says that belong to Baldur’s Gate 3 and not to the game on screen. All three models were trained on the same Baldur’s Gate 3 clips.</p>
+    </div>
+    <div class="bars" id="leakbars"></div>
+  </div>
+</section>
+
+<!-- ================= METHOD ================= -->
+<section id="method" class="wrap reveal">
+  <div class="pill"><img src="static/icons/bulb.png" alt=""><h2>How StreamDuo works</h2></div>
+  <p class="lead">Two agents with complementary strengths. The <b>commentator</b> watches every second and decides when to talk, but only knows the game it was trained on. The <b>research agent</b> sees nothing unless asked, but can read the wiki of whatever game is being played.</p>
+  <div class="card fig">
+    <img src="static/img/framework_fig.png" alt="StreamDuo overview figure">
+    <p class="figcap">Top: on an unseen game, the commentator asks the frozen research agent with the current frames, and the wiki entry that returns two seconds later lets it name what is on screen. Bottom: the two training stages.</p>
+  </div>
+
+  <div class="steps">
+    <div class="card step"><div class="num">1</div>
+      <div class="ic"><img src="static/icons/robot.png" alt=""><img src="static/icons/eyes.png" alt=""></div>
+      <h3>Ask with frames</h3>
+      <p>A model that cannot recognize a character cannot describe it well enough to search for it either. So the commentator sends the frames themselves, when its ask head fires.</p>
+    </div>
+    <div class="card step"><div class="num">2</div>
+      <div class="ic"><img src="static/icons/detective.png" alt=""><img src="static/icons/lens.png" alt=""><img src="static/icons/books.png" alt=""></div>
+      <h3>Look, search, pick</h3>
+      <p>The frozen research agent reads the frames, searches the game’s wiki, checks the candidates against the frames again, and returns up to three entries.</p>
+    </div>
+    <div class="card step"><div class="num">3</div>
+      <div class="ic"><img src="static/icons/clock.png" alt=""><img src="static/icons/mic.png" alt=""></div>
+      <h3>Keep talking, then use it</h3>
+      <p>The stream does not wait. The answer arrives two seconds later and stays in context, and the commentator weaves it into its next line.</p>
+    </div>
+  </div>
+
+  <div class="train">
+    <div class="card">
+      <div class="stg">Stage 1 · supervised</div>
+      <h3>Learn <i>when</i> to ask</h3>
+      <p>Asking only helps when the model does not already know the answer. We score each human line with and without an ideal answer, and label an ask two seconds earlier only where the answer clearly helps.</p>
+      <div class="eq">g = log p(line | answer) − log p(line | no answer) <br><span style="white-space:nowrap">ask if <b>g&nbsp;&gt;&nbsp;1</b> nat</span></div>
+      <div class="chips"><span class="chip"><img src="static/icons/check.png" alt="">“Minthara”: g large → ask</span><span class="chip"><img src="static/icons/cross.png" alt="">“Lae’zel is still…”: g = 0.1 → no ask</span></div>
+    </div>
+    <div class="card">
+      <div class="stg">Stage 2 · on-policy self-distillation</div>
+      <h3>Learn <i>how</i> to use answers</h3>
+      <p>Real answers are noisy. The student sees the agent’s answer as it would at test time. Its teacher is the same model, frozen, shown the ideal answer. The student learns on its own samples with reverse KL.</p>
+      <div class="chips">
+        <span class="chip"><img src="static/icons/student.png" alt="">student · noisy answer · + LoRA</span>
+        <span class="chip"><img src="static/icons/teacher.png" alt="">teacher · ideal answer · LoRA off</span>
+        <span class="chip"><img src="static/icons/snow.png" alt="">research agent stays frozen</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GAMES ================= -->
+<section id="games" class="wrap reveal">
+  <div class="pill"><img src="static/icons/game.png" alt=""><h2>One game in, ten games out</h2></div>
+  <p class="lead">Trained on <b>Baldur’s Gate 3</b> alone. Tested on <b>2,470 clips</b> from ten games it has never seen, from open-world adventures to esports finals.</p>
+  <div class="gwrap"><div id="src-card"></div><div class="arrow"><svg viewBox="0 0 56 30"><path d="M2 15h46M38 5l12 10-12 10" fill="none" stroke="#bf650b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>train once,<br>test on 10</div><div class="games" id="games-grid"></div></div>
+</section>
+
+<!-- ================= RESULTS ================= -->
+<section id="results" class="wrap reveal">
+  <div class="pill"><img src="static/icons/chart.png" alt=""><h2>Results on ten unseen games</h2></div>
+  <p class="lead">Compared with recent streaming video LLMs, zero-shot and retrained on the same Baldur’s Gate 3 data.</p>
+  <div class="card res">
+    <div class="tabs" id="tabs" role="group" aria-label="Metric"></div>
+    <p class="mdesc" id="mdesc"></p>
+    <div class="rbars" id="rbars"></div>
+    <p class="note">Knowledge metrics count the first 126 words of each clip (twice the human average), so a model cannot gain recall by talking more. Judge scores come from a local Qwen3-30B. Numbers are preliminary.</p>
+  </div>
+</section>
+
+<!-- ================= BIBTEX ================= -->
+<section id="bibtex" class="wrap reveal">
+  <div class="pill"><img src="static/icons/scroll.png" alt=""><h2>BibTeX</h2></div>
+  <div class="card bib">
+    <button type="button" id="copybib">Copy</button>
+<pre id="bibtext">@article{streamduo2026,
+  title  = {StreamDuo: A Live Commentator and a Research Agent for Unseen Games},
+  author = {Anonymous},
+  year   = {2026}
+}</pre>
+  </div>
+</section>
+</main>
+
+<footer class="wrap">
+  <div class="cast-mini"><img src="static/icons/robot.png" alt=""><img src="static/icons/detective.png" alt=""></div>
+  Icons: Microsoft Fluent Emoji (MIT). Fonts: Inter (OFL) and P052. Page layout inspired by the Action Images project page.
+</footer>
+
+<script>
+// ---------------- live replay data (Tears of the Kingdom, walkthrough_29, seconds 2103-2112) ----------------
+const SECS = [2103, 2104, 2105, 2106, 2107, 2108, 2109, 2110, 2111, 2112];
+const ASK = 2106, ANSWER = 2108;
+const SINGLE = { 2103: "going to say", 2104: "you’re the", 2105: "Chief’s guest.", 2106: "His ears look", 2107: "to be about",
+  2108: "the circumference", 2109: "of his", 2110: "", 2111: "head and", 2112: "neck, interesting." };
+const DUO = { 2103: "", 2104: "chief’s guest.", 2105: "Hmm, so", 2106: "this is", 2107: "a Veil.", 2108: "His ears look",
+  2109: "to be…", 2110: "<span class='ent'>Cara</span> is a", 2111: "<span class='ent'>jewelry owner</span> in", 2112: "the town." };
+
+const $ = id => document.getElementById(id);
+const frame = $("frame"), t1 = $("t1"), t2 = $("t2"), clock = $("clock"), card = $("agentcard"), fill = $("fill"), track = $("track");
+SECS.forEach(s => { const im = new Image(); im.src = `static/img/cara_${s}.jpg`; });
+
+SECS.forEach((s, i) => {
+  const x = (i / (SECS.length - 1)) * 100;
+  const d = document.createElement("div");
+  d.className = "tick" + (s === ASK ? " ask" : s === ANSWER ? " ans" : "");
+  d.style.left = x + "%"; d.title = `${s} s`;
+  d.addEventListener("click", () => { stop(); show(i); });
+  track.appendChild(d);
+  if (s === ASK || s === ANSWER) {
+    const l = document.createElement("div");
+    l.className = "lbl " + (s === ASK ? "ask" : "ans");
+    l.style.left = x + "%"; l.textContent = s === ASK ? "ask" : "answer";
+    track.appendChild(l);
+  }
+});
+
+function lane(map, upto, withAsk) {
+  return SECS.filter(s => s <= upto && map[s]).map(s => {
+    const chip = withAsk && s === ASK ? "<span class='askchip'>ask</span>" : "";
+    return `<span class="w${s === upto ? " now" : ""}">${map[s]}</span>${chip}`;
+  }).join(" ");
+}
+let idx = 0, timer = null;
+function show(i) {
+  idx = i; const s = SECS[i];
+  frame.src = `static/img/cara_${s}.jpg`;
+  const m = Math.floor(s / 60), sec = s % 60;
+  clock.textContent = `${m}:${String(sec).padStart(2, "0")}`;
+  t1.innerHTML = lane(SINGLE, s, false) || "&nbsp;";
+  t2.innerHTML = lane(DUO, s, true) || "&nbsp;";
+  card.classList.toggle("on", s >= ANSWER);
+  fill.style.width = (i / (SECS.length - 1)) * 100 + "%";
+  const end = i === SECS.length - 1;
+  $("v1").classList.toggle("on", end); $("v2").classList.toggle("on", end);
+}
+function tick() {
+  if (idx >= SECS.length - 1) { timer = setTimeout(() => { show(0); timer = setTimeout(tick, 1000); }, 2600); return; }
+  show(idx + 1); timer = setTimeout(tick, 1000);
+}
+function play() { if (timer) return; $("play").textContent = "❚❚ Pause"; if (idx >= SECS.length - 1) show(0); timer = setTimeout(tick, 1000); }
+function stop() { clearTimeout(timer); timer = null; $("play").textContent = "▶ Play"; }
+$("play").addEventListener("click", () => timer ? stop() : play());
+show(0);
+const ro = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && !timer && idx === 0) play(); }), { threshold: .5 });
+ro.observe($("replay"));
+
+// ---------------- leakage bars ----------------
+const LEAK = [["StreamingVLM", 17.3], ["Proact-VL", 9.9], ["StreamDuo (ours)", 1.0, true]];
+$("leakbars").innerHTML = LEAK.map(([n, v, us]) =>
+  `<div class="bar${us ? " us" : ""}"><span>${n}</span><div class="b" data-w="${v / 17.3 * 100}"></div><span class="v">${v.toFixed(1)}%</span></div>`).join("");
+
+// ---------------- games ----------------
+const GAMES = [["g_bg3.jpg", "Baldur’s Gate 3", "training game", true],
+  ["g_tears_of_the_kingdom_1.jpg", "Tears of the Kingdom", "adventure"], ["g_elden_ring_0.jpg", "Elden Ring", "action RPG"],
+  ["g_black_myth_wukong_0.jpg", "Black Myth: Wukong", "action RPG"], ["g_cyberpunk_2077_1.jpg", "Cyberpunk 2077", "open world"],
+  ["g_minecraft_0.jpg", "Minecraft", "sandbox"], ["g_lol_1.jpg", "League of Legends", "esports"],
+  ["g_csgo_1.jpg", "Counter-Strike 2", "esports"], ["g_starcraft2_1.jpg", "StarCraft II", "esports"],
+  ["g_streetfighter6_2.jpg", "Street Fighter 6", "fighting"], ["g_yu_gi_oh_1.jpg", "Yu-Gi-Oh!", "card game"]];
+const gcard = ([f, n, k, src]) =>
+  `<div class="gm${src ? " src" : ""}"><img src="static/img/${f}" alt="${n}" loading="lazy"><div class="n">${n}</div><div class="k">${src ? "★ " : ""}${k}</div></div>`;
+$("src-card").innerHTML = gcard(GAMES[0]);
+$("games-grid").innerHTML = GAMES.slice(1).map(gcard).join("");
+
+// ---------------- results (main table, knowledge metrics under the 126-word budget) ----------------
+const MODELS = [
+  ["LiveCC-7B-Instruct", "zero-shot", { f1: .470, er: .099, ks: .115, lu: 3.56, fq: 2.59 }],
+  ["StreamingVLM", "zero-shot", { f1: .509, er: .076, ks: .086, lu: 4.58, fq: 3.25 }],
+  ["MMDuet2", "zero-shot", { f1: .330, er: .073, ks: .083, lu: 5.05, fq: 3.47 }],
+  ["Proact-VL", "trained on BG3", { f1: .536, er: .082, ks: .085, lu: 4.91, fq: 3.32 }],
+  ["StreamingVLM", "trained on BG3", { f1: .478, er: .076, ks: .083, lu: 4.77, fq: 3.20 }],
+  ["StreamDuo (ours)", "trained on BG3", { f1: .552, er: .116, ks: .127, lu: 5.14, fq: 3.53 }, true]];
+const METRICS = [
+  ["er", "Entity recall", "How many of the entities the human caster named the model also named.", 3],
+  ["ks", "K-strict", "Recall of entities in human lines that need game knowledge, not just what is visible.", 3],
+  ["f1", "Timing F1", "Whether the model speaks in the seconds when the human caster speaks.", 3],
+  ["lu", "LiveU", "LLM judge, 1 to 10: timing, speaking rate and understanding of what happens on screen.", 2],
+  ["fq", "FinalQ", "LLM judge, 1 to 10: fidelity, continuity and substance of the whole commentary.", 2]];
+let cur = "er";
+function drawRes() {
+  const [, , desc, nd] = METRICS.find(m => m[0] === cur);
+  const max = Math.max(...MODELS.map(m => m[2][cur]));
+  $("mdesc").textContent = desc;
+  $("rbars").innerHTML = MODELS.map(([n, k, v, us]) =>
+    `<div class="rb${us ? " us" : ""}"><span class="nm">${n}<small>${k}</small></span><div class="b" style="width:0" data-w="${v[cur] / max * 100}"></div><span class="v">${v[cur].toFixed(nd)}</span></div>`).join("");
+  requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll("#rbars .b").forEach(b => b.style.width = b.dataset.w + "%")));
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.k === cur));
+}
+$("tabs").innerHTML = METRICS.map(([k, n]) => `<button type="button" data-k="${k}">${n}</button>`).join("");
+$("tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { cur = b.dataset.k; drawRes(); } });
+
+// ---------------- reveal on scroll ----------------
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  e.target.classList.add("in");
+  e.target.querySelectorAll(".bar .b").forEach(b => b.style.width = b.dataset.w + "%");
+  if (e.target.id === "results") drawRes();
+  io.unobserve(e.target);
+}), { threshold: .15 });
+document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+drawRes();
+
+// ---------------- copy bibtex ----------------
+$("copybib").addEventListener("click", async () => {
+  const b = $("copybib");
+  try { await navigator.clipboard.writeText($("bibtext").textContent); b.textContent = "Copied!"; }
+  catch { const r = document.createRange(); r.selectNodeContents($("bibtext")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected"; }
+  setTimeout(() => b.textContent = "Copy", 1600);
+});
+</script>
+</body>
+</html>

@@ -169,7 +169,7 @@ section { padding-block: 44px; scroll-margin-top: 64px; }
 
 /* ---------- live replay ---------- */
 .replay { margin-top: 26px; padding: 18px; display: grid; gap: 16px; }
-.stage { position: relative; border-radius: 14px; overflow: hidden; border: 2px solid var(--navy); background: #0b0f17; }
+.stage { position: relative; border-radius: 14px; overflow: hidden; border: 2px solid var(--navy); background: #0b0f17; width: 100%; max-width: 720px; justify-self: center; }
 .stage img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
 .stage .badge {
   position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; align-items: center;
@@ -475,7 +475,7 @@ footer .cast-mini img { width: 30px; }
   <div class="pill"><img src="static/icons/bulb.png" alt=""><h2>How StreamDuo works</h2></div>
   <p class="lead">Two agents with complementary strengths. The <b>commentator</b> watches every second and decides when to talk, but only knows the game it was trained on. The <b>research agent</b> sees nothing unless asked, but can read the wiki of whatever game is being played.</p>
   <div class="card fig">
-    <img src="static/img/framework_fig.png" alt="StreamDuo overview figure">
+    <img src="static/img/framework_fig.svg" alt="StreamDuo overview figure">
     <p class="figcap">Top: on an unseen game, the commentator asks the frozen research agent with the current frames, and the wiki entry that returns two seconds later lets it name what is on screen. Bottom: the two training stages.</p>
   </div>
 

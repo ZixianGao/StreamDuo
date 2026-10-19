@@ -145,13 +145,12 @@ h1, h2, h3 { font-family: var(--serif); color: var(--ink); text-wrap: balance; m
 
 /* ---------- section scaffolding ---------- */
 section { padding-block: 44px; scroll-margin-top: 64px; }
-.pill {
-  display: inline-flex; align-items: center; gap: 10px; background: var(--card);
-  border: var(--line); border-radius: 999px; padding: 6px 18px 6px 8px; box-shadow: 3px 3px 0 var(--navy);
-}
-.pill img { width: 30px; }
-.pill h2 { font-size: 22px; }
-.lead { font: 400 18px/1.7 var(--sans); color: var(--sub); max-width: 760px; margin: 18px 0 0; }
+.pill { display: flex; align-items: baseline; gap: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--navy); }
+.pill img { display: none; }
+.pill h2 { font-size: 28px; letter-spacing: -.01em; }
+main, body { counter-reset: sec; }
+.pill::before { counter-increment: sec; content: counter(sec, decimal-leading-zero); font: 700 15px var(--mono); color: var(--orange-d); }
+.lead { font: 400 18px/1.7 var(--sans); color: var(--sub); max-width: none; margin: 18px 0 0; }
 .lead b { color: var(--ink); }
 .card {
   background: var(--card); border: var(--line); border-radius: 22px; box-shadow: var(--pop);
@@ -163,11 +162,11 @@ section { padding-block: 44px; scroll-margin-top: 64px; }
 .tv .ant { position: absolute; top: -38px; left: 50%; width: 90px; height: 40px; transform: translateX(-50%); }
 
 /* ---------- tl;dr ---------- */
-.tldr { margin-top: 26px; padding: 22px 26px; display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; background: var(--orange-l); }
-.tldr img { width: 56px; }
+.tldr { margin-top: 30px; padding: 4px 0 4px 22px; background: none; border: none; box-shadow: none; border-left: 4px solid var(--orange); border-radius: 0; }
+.tldr img { display: none; }
 .tldr p { margin: 0; font: 400 20px/1.55 var(--serif); }
 .tldr p b { color: var(--orange-d); }
-@media (max-width: 600px) { .tldr { grid-template-columns: 1fr; } .tldr p { font-size: 18px; } }
+@media (max-width: 600px) { .tldr p { font-size: 18px; } }
 
 /* ---------- live replay ---------- */
 .replay { margin-top: 26px; padding: 18px; display: grid; gap: 16px; }
@@ -327,7 +326,7 @@ section { padding-block: 44px; scroll-margin-top: 64px; }
 
 /* ---------- bibtex ---------- */
 .bib { margin-top: 24px; padding: 18px 20px; position: relative; }
-.bib pre { margin: 0; font: 13.5px/1.6 var(--mono); color: var(--ink); overflow-x: auto; white-space: pre; }
+.bib pre { margin: 0; font: 13.5px/1.6 var(--mono); color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; padding-right: 64px; }
 .bib button { position: absolute; top: 12px; right: 12px; font: 600 13px var(--sans); border: 2px solid var(--navy); background: var(--card); border-radius: 999px; padding: 4px 12px; cursor: pointer; color: var(--navy); }
 
 footer { padding-block: 34px 48px; text-align: center; font: 13px var(--sans); color: var(--faint); }
@@ -356,7 +355,6 @@ footer .cast-mini img { width: 30px; }
 <main id="top">
 <!-- ================= HERO ================= -->
 <div class="hero wrap">
-  <span class="onair"><i></i>Live · cross-game commentary</span>
   <h1>Stream<span class="duo">Duo</span></h1>
   <p class="tag">A Live Commentator and a Research Agent for Unseen Games</p>
 
@@ -394,14 +392,14 @@ footer .cast-mini img { width: 30px; }
 
 <!-- ================= GAMES ================= -->
 <section id="games" class="wrap reveal">
-  <div class="pill"><img src="static/icons/game.png" alt=""><h2>One game in, ten games out</h2></div>
+  <div class="pill"><h2>One game in, ten games out</h2></div>
   <p class="lead">Trained on <b>Baldur’s Gate 3</b> alone. Tested on <b>2,470 clips</b> from ten games it has never seen, from open-world adventures to esports finals.</p>
   <div class="gwrap"><div id="src-card"></div><div class="arrow"><svg viewBox="0 0 56 30"><path d="M2 15h46M38 5l12 10-12 10" fill="none" stroke="#bf650b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>train once,<br>test on 10</div><div class="games" id="games-grid"></div></div>
 </section>
 
 <!-- ================= VIDEO ================= -->
 <section id="video" class="wrap reveal">
-  <div class="pill"><img src="static/icons/tv.png" alt=""><h2>Watch</h2></div>
+  <div class="pill"><h2>Watch</h2></div>
   <div class="card tv">
     <video controls muted playsinline preload="metadata" poster="static/video/streamduo_poster.jpg">
       <source src="static/video/streamduo_promo.mp4" type="video/mp4">
@@ -415,7 +413,7 @@ footer .cast-mini img { width: 30px; }
 
 <!-- ================= LIVE REPLAY ================= -->
 <section id="replay" class="wrap reveal">
-  <div class="pill"><img src="static/icons/red.png" alt=""><h2>Live replay</h2></div>
+  <div class="pill"><h2>Live replay</h2></div>
   <p class="lead">Ten real seconds of <b>The Legend of Zelda: Tears of the Kingdom</b>, a game neither model saw in training. Both commentators were trained only on Baldur’s Gate 3. Press play and watch them side by side.</p>
   <div class="card replay">
     <div class="stage">
@@ -451,21 +449,21 @@ footer .cast-mini img { width: 30px; }
 
 <!-- ================= PROBLEM ================= -->
 <section id="problem" class="wrap reveal">
-  <div class="pill"><img src="static/icons/game.png" alt=""><h2>Timing transfers. Knowledge does not.</h2></div>
+  <div class="pill"><h2>Timing transfers. Knowledge does not.</h2></div>
   <p class="lead">A streaming commentator trained on one game learns <b>when</b> to talk, and that carries over to any game. What it learns to <b>say</b> about characters, items and places belongs to the training game. Facing a new game, it does one of three things.</p>
   <div class="trio">
     <div class="card">
-      <div class="hd"><img src="static/icons/speak.png" alt=""><h3>Talks around it</h3></div>
+      <div class="hd"><h3>Talks around it</h3></div>
       <p>Describes what it sees and never names it.</p>
       <div class="q meh">“His ears look to be about the circumference of his head and neck, interesting.”</div>
     </div>
     <div class="card">
-      <div class="hd"><img src="static/icons/brain.png" alt=""><h3>Reaches for its training game</h3></div>
-      <p>Fills the gap with a name it memorized from Baldur’s Gate 3.</p>
-      <div class="q bad">A character in Tears of the Kingdom called <span class="x">“Shadowheart”</span>.</div>
+      <div class="hd"><h3>Reaches for its training game</h3></div>
+      <p>Fills the gap with a name it memorized from Baldur’s Gate 3, here for a Tears of the Kingdom character called Calip.</p>
+      <div class="q bad">“There’s research to be done. <span class="x">Karlach</span>, will you join me?”</div>
     </div>
     <div class="card">
-      <div class="hd"><img src="static/icons/detective.png" alt=""><h3>Asks, and names it</h3></div>
+      <div class="hd"><h3>Asks, and names it</h3></div>
       <p>StreamDuo sends the frames to a research agent and uses what comes back.</p>
       <div class="q good">“<span class="ok">Cara</span> is a <span class="ok">jewelry owner</span> in the town.”</div>
     </div>
@@ -481,7 +479,7 @@ footer .cast-mini img { width: 30px; }
 
 <!-- ================= METHOD ================= -->
 <section id="method" class="wrap reveal">
-  <div class="pill"><img src="static/icons/bulb.png" alt=""><h2>How StreamDuo works</h2></div>
+  <div class="pill"><h2>How StreamDuo works</h2></div>
   <p class="lead">Two agents with complementary strengths. The <b>commentator</b> watches every second and decides when to talk, but only knows the game it was trained on. The <b>research agent</b> sees nothing unless asked, but can read the wiki of whatever game is being played.</p>
   <div class="card fig">
     <img src="static/img/framework_fig.svg" alt="StreamDuo overview figure">
@@ -490,17 +488,14 @@ footer .cast-mini img { width: 30px; }
 
   <div class="steps">
     <div class="card step"><div class="num">1</div>
-      <div class="ic"><img src="static/icons/robot.png" alt=""><img src="static/icons/eyes.png" alt=""></div>
       <h3>Ask with frames</h3>
       <p>A model that cannot recognize a character cannot describe it well enough to search for it either. So the commentator sends the frames themselves, when its ask head fires.</p>
     </div>
     <div class="card step"><div class="num">2</div>
-      <div class="ic"><img src="static/icons/detective.png" alt=""><img src="static/icons/lens.png" alt=""><img src="static/icons/books.png" alt=""></div>
       <h3>Look, search, pick</h3>
       <p>The frozen research agent reads the frames, searches the game’s wiki, checks the candidates against the frames again, and returns up to three entries.</p>
     </div>
     <div class="card step"><div class="num">3</div>
-      <div class="ic"><img src="static/icons/clock.png" alt=""><img src="static/icons/mic.png" alt=""></div>
       <h3>Keep talking, then use it</h3>
       <p>The stream does not wait. The answer arrives two seconds later and stays in context, and the commentator weaves it into its next line.</p>
     </div>
@@ -512,16 +507,16 @@ footer .cast-mini img { width: 30px; }
       <h3>Learn <i>when</i> to ask</h3>
       <p>Asking only helps when the model does not already know the answer. We score each human line with and without an ideal answer, and label an ask two seconds earlier only where the answer clearly helps.</p>
       <div class="eq">g = log p(line | answer) − log p(line | no answer) <br><span style="white-space:nowrap">ask if <b>g&nbsp;&gt;&nbsp;1</b> nat</span></div>
-      <div class="chips"><span class="chip"><img src="static/icons/check.png" alt="">“Minthara”: g large → ask</span><span class="chip"><img src="static/icons/cross.png" alt="">“Lae’zel is still…”: g = 0.1 → no ask</span></div>
+      <div class="chips"><span class="chip">“Minthara”: g large → ask</span><span class="chip">“Lae’zel is still…”: g = 0.1 → no ask</span></div>
     </div>
     <div class="card">
       <div class="stg">Stage 2 · on-policy self-distillation</div>
       <h3>Learn <i>how</i> to use answers</h3>
       <p>Real answers are noisy. The student sees the agent’s answer as it would at test time. Its teacher is the same model, frozen, shown the ideal answer. The student learns on its own samples with reverse KL.</p>
       <div class="chips">
-        <span class="chip"><img src="static/icons/student.png" alt="">student · noisy answer · + LoRA</span>
-        <span class="chip"><img src="static/icons/teacher.png" alt="">teacher · ideal answer · LoRA off</span>
-        <span class="chip"><img src="static/icons/snow.png" alt="">research agent stays frozen</span>
+        <span class="chip">student · noisy answer · + LoRA</span>
+        <span class="chip">teacher · ideal answer · LoRA off</span>
+        <span class="chip">research agent stays frozen</span>
       </div>
     </div>
   </div>
@@ -529,19 +524,19 @@ footer .cast-mini img { width: 30px; }
 
 <!-- ================= RESULTS ================= -->
 <section id="results" class="wrap reveal">
-  <div class="pill"><img src="static/icons/chart.png" alt=""><h2>Results on ten unseen games</h2></div>
+  <div class="pill"><h2>Results on ten unseen games</h2></div>
   <p class="lead">Compared with recent streaming video LLMs, zero-shot and retrained on the same Baldur’s Gate 3 data.</p>
   <div class="card res">
     <div class="tabs" id="tabs" role="group" aria-label="Metric"></div>
     <p class="mdesc" id="mdesc"></p>
     <div class="rbars" id="rbars"></div>
-    <p class="note">Knowledge metrics count the first 126 words of each clip (twice the human average), so a model cannot gain recall by talking more. Judge scores come from a local Qwen3-30B. Numbers are preliminary.</p>
+    <p class="note">Knowledge metrics count the first 126 words of each clip (twice the human average), so a model cannot gain recall by talking more. Judge scores come from a local Qwen3-30B.</p>
   </div>
 </section>
 
 <!-- ================= BIBTEX ================= -->
 <section id="bibtex" class="wrap reveal">
-  <div class="pill"><img src="static/icons/scroll.png" alt=""><h2>BibTeX</h2></div>
+  <div class="pill"><h2>BibTeX</h2></div>
   <div class="card bib">
     <button type="button" id="copybib">Copy</button>
 <pre id="bibtext">@article{streamduo2026,

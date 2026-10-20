@@ -17,6 +17,7 @@
 @font-face { font-family: "Inter"; src: url(static/fonts/Inter-Regular.ttf) format("truetype"); font-weight: 400; font-display: swap; }
 @font-face { font-family: "Inter"; src: url(static/fonts/Inter-SemiBold.ttf) format("truetype"); font-weight: 600; font-display: swap; }
 @font-face { font-family: "Inter"; src: url(static/fonts/Inter-Bold.ttf) format("truetype"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Fredoka"; src: url(static/fonts/Fredoka-Bold.ttf) format("truetype"); font-weight: 700; font-display: swap; }
 
 /* One visual world shared with the paper figures: paper white, navy ink outlines, broadcast orange. */
 :root {
@@ -68,7 +69,8 @@ h1, h2, h3 { font-family: var(--serif); color: var(--ink); text-wrap: balance; m
   border-bottom: 2px solid rgba(47,70,119,.18);
 }
 .topbar .wrap { display: flex; align-items: center; gap: 18px; height: 52px; }
-.brand { display: flex; align-items: center; gap: 8px; font: 700 18px var(--serif); color: var(--navy); text-decoration: none; }
+.brand { display: flex; align-items: center; gap: 8px; font: 700 20px "Fredoka", var(--sans); color: var(--navy); text-decoration: none; }
+.brand .duo { color: var(--orange); }
 .brand img { width: 26px; }
 .nav { display: flex; gap: 4px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
 .nav a {
@@ -88,7 +90,58 @@ h1, h2, h3 { font-family: var(--serif); color: var(--ink); text-wrap: balance; m
 .onair i { width: 9px; height: 9px; border-radius: 50%; background: var(--red); animation: blink 1.2s infinite; }
 @keyframes blink { 50% { opacity: .25; } }
 .hero h1 {
-  font-size: clamp(54px, 10vw, 104px); line-height: 1; margin-top: 18px; letter-spacing: -.01em;
+  font: 700 clamp(54px, 10vw, 104px)/1.05 "Fredoka", var(--sans); margin-top: 18px; letter-spacing: .005em;
+  color: var(--navy);
+  /* sticker look of the logo: white outline + offset navy shadow */
+  text-shadow: 5.00px 0.00px 0 #fff,
+    4.83px 1.29px 0 #fff,
+    4.33px 2.50px 0 #fff,
+    3.54px 3.54px 0 #fff,
+    2.50px 4.33px 0 #fff,
+    1.29px 4.83px 0 #fff,
+    0.00px 5.00px 0 #fff,
+    -1.29px 4.83px 0 #fff,
+    -2.50px 4.33px 0 #fff,
+    -3.54px 3.54px 0 #fff,
+    -4.33px 2.50px 0 #fff,
+    -4.83px 1.29px 0 #fff,
+    -5.00px 0.00px 0 #fff,
+    -4.83px -1.29px 0 #fff,
+    -4.33px -2.50px 0 #fff,
+    -3.54px -3.54px 0 #fff,
+    -2.50px -4.33px 0 #fff,
+    -1.29px -4.83px 0 #fff,
+    -0.00px -5.00px 0 #fff,
+    1.29px -4.83px 0 #fff,
+    2.50px -4.33px 0 #fff,
+    3.54px -3.54px 0 #fff,
+    4.33px -2.50px 0 #fff,
+    4.83px -1.29px 0 #fff,
+    11.00px 6.00px 0 var(--navy),
+    10.83px 7.29px 0 var(--navy),
+    10.33px 8.50px 0 var(--navy),
+    9.54px 9.54px 0 var(--navy),
+    8.50px 10.33px 0 var(--navy),
+    7.29px 10.83px 0 var(--navy),
+    6.00px 11.00px 0 var(--navy),
+    4.71px 10.83px 0 var(--navy),
+    3.50px 10.33px 0 var(--navy),
+    2.46px 9.54px 0 var(--navy),
+    1.67px 8.50px 0 var(--navy),
+    1.17px 7.29px 0 var(--navy),
+    1.00px 6.00px 0 var(--navy),
+    1.17px 4.71px 0 var(--navy),
+    1.67px 3.50px 0 var(--navy),
+    2.46px 2.46px 0 var(--navy),
+    3.50px 1.67px 0 var(--navy),
+    4.71px 1.17px 0 var(--navy),
+    6.00px 1.00px 0 var(--navy),
+    7.29px 1.17px 0 var(--navy),
+    8.50px 1.67px 0 var(--navy),
+    9.54px 2.46px 0 var(--navy),
+    10.33px 3.50px 0 var(--navy),
+    10.83px 4.71px 0 var(--navy),
+    6px 6px 0 var(--navy);
 }
 .hero h1 .duo { color: var(--orange); }
 .hero .tag {
@@ -345,7 +398,7 @@ footer .cast-mini img { width: 30px; }
 
 <header class="topbar">
   <div class="wrap">
-    <a class="brand" href="#top"><img src="static/icons/robot.png" alt="">StreamDuo</a>
+    <a class="brand" href="#top"><img src="static/icons/robot.png" alt=""><span>Stream<span class="duo">Duo</span></span></a>
     <nav class="nav" aria-label="Sections">
       <a href="#games">Games</a><a href="#video">Video</a><a href="#replay">Live replay</a><a href="#problem">Problem</a>
       <a href="#method">Method</a><a href="#results">Results</a><a href="#bibtex">BibTeX</a>
